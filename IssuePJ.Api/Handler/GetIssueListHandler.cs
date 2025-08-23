@@ -2,6 +2,8 @@ using System;
 using IssuePj.Api.Entities;
 using IssuePJ.Api.Command;
 using IssuePJ.Api.Context;
+using IssuePJ.Api.Response;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 
 namespace IssuePJ.Api.Handler;
@@ -15,8 +17,10 @@ public class GetIssueListHandler
         _context = context;
     }
 
-    public async Task<List<Issue>> Handle(GetIssueListCommand command)
+    public async Task<IndexModel<Issue>> Handle(GetIssueListCommand command)
     {
-        return await _context.Issues.AsNoTracking().ToListAsync();
+        var start = (command.Page - 1) * command.PageSize;
+        var issues = await _context.Issues.AsNoTracking().Skip(start).Take(command.PageSize).ToListAsync();
+        return new IndexModel<Issue> { Items = issues, TotalCount = await _context.Issues.CountAsync(), Page = command.Page, PageSize = command.PageSize };
     }
 }
