@@ -27,6 +27,7 @@ builder.Services.AddLocalization(options => options.ResourcesPath ="");
 
 builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddCors();
 
 var app = builder.Build();
 
@@ -51,7 +52,7 @@ var localizationOptions = new RequestLocalizationOptions()
 
 app.UseRequestLocalization(localizationOptions);
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseExceptionHandler(_ => { });
 
