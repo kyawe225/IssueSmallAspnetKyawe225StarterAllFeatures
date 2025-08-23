@@ -2,6 +2,7 @@ using IssuePj.Api.Entities;
 using IssuePJ.Api.Command;
 using IssuePJ.Api.Context;
 using IssuePJ.Api.Exceptions;
+using IssuePJ.Api.Response;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -47,9 +48,9 @@ app.MapGet("/issues/{Id}", async (string Id, IMessageBus messageBus) =>
     return Results.Ok(issue);
 });
 
-app.MapGet("/issues", async (IMessageBus messageBus) =>
+app.MapGet("/issues", async (IMessageBus messageBus,[FromQuery] int? page , [FromQuery] int? pageSize ) =>
 {
-    List<Issue> issue = await messageBus.InvokeAsync<List<Issue>>(new GetIssueListCommand());
+    IndexModel<Issue> issue = await messageBus.InvokeAsync<IndexModel<Issue>>(new GetIssueListCommand(page ?? 1,pageSize ?? 2));
     return Results.Ok(issue);
 });
 
