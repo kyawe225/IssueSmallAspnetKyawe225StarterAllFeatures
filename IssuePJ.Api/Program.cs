@@ -21,9 +21,9 @@ builder.Services.AddWolverine(x =>
     x.Durability.Mode = DurabilityMode.MediatorOnly;
 });
 
-builder.Services.AddDbContext<ApplicationContext>(p=> p.UseNpgsql(builder?.Configuration?.GetConnectionString("ConnectionString")));
+builder.Services.AddDbContext<ApplicationContext>(p => p.UseNpgsql(builder?.Configuration?.GetConnectionString("ConnectionString")));
 
-builder.Services.AddLocalization(options => options.ResourcesPath ="");
+builder.Services.AddLocalization(options => options.ResourcesPath = "");
 
 builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -72,25 +72,35 @@ app.MapGet("/hello", async (IStringLocalizer<SharedResource> localizer) =>
 app.MapPost("/issues", async ([FromBody] CreateIssueCommand command, IMessageBus messageBus) =>
 {
     await messageBus.InvokeAsync(command);
-    return Results.Ok("Created Issue Successfully!");
+    return Results.Ok(new ResponseModel<Issue>
+    {
+        Status = "200",
+        Message = "Issue created successfully",
+        Data = null
+    });
 });
 
 app.MapGet("/issues/{Id}", async (string Id, IMessageBus messageBus) =>
 {
-    Issue issue= await messageBus.InvokeAsync<Issue>(new GetIssueCommand(Id));
+    ResponseModel<Issue> issue = await messageBus.InvokeAsync<ResponseModel<Issue>>(new GetIssueCommand(Id));
     return Results.Ok(issue);
 });
 
-app.MapGet("/issues", async (IMessageBus messageBus,[FromQuery] int? page , [FromQuery] int? pageSize ) =>
+app.MapGet("/issues", async (IMessageBus messageBus, [FromQuery] int? page, [FromQuery] int? pageSize) =>
 {
-    IndexModel<Issue> issue = await messageBus.InvokeAsync<IndexModel<Issue>>(new GetIssueListCommand(page ?? 1,pageSize ?? 2));
+    ResponseModel<IndexModel<Issue>> issue = await messageBus.InvokeAsync<ResponseModel<IndexModel<Issue>>>(new GetIssueListCommand(page ?? 1, pageSize ?? 2));
     return Results.Ok(issue);
 });
 
 app.MapDelete("/issues/{Id}", async (string Id, IMessageBus messageBus) =>
 {
     await messageBus.InvokeAsync(new DeleteIssueCommand(Id));
-    return Results.Ok("Delete Successfully!");
+    return Results.Ok(new ResponseModel<Issue>
+    {
+        Status = "200",
+        Message = "Issue deleted successfully",
+        Data = null
+    });
 });
 
 
