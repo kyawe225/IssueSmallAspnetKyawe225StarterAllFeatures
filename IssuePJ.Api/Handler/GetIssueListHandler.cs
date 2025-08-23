@@ -17,10 +17,21 @@ public class GetIssueListHandler
         _context = context;
     }
 
-    public async Task<IndexModel<Issue>> Handle(GetIssueListCommand command)
+    public async Task<ResponseModel<IndexModel<Issue>>> Handle(GetIssueListCommand command)
     {
         var start = (command.Page - 1) * command.PageSize;
         var issues = await _context.Issues.AsNoTracking().Skip(start).Take(command.PageSize).ToListAsync();
-        return new IndexModel<Issue> { Items = issues, TotalCount = await _context.Issues.CountAsync(), Page = command.Page, PageSize = command.PageSize };
+        return new ResponseModel<IndexModel<Issue>>
+        {
+            Status = "200",
+            Message = "Issues retrieved successfully",
+            Data = new IndexModel<Issue>
+            {
+                Items = issues,
+                TotalCount = await _context.Issues.CountAsync(),
+                Page = command.Page,
+                PageSize = command.PageSize
+            }
+        };
     }
 }

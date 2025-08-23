@@ -344,7 +344,8 @@
         {
             isLoading = true;
             
-            allIssues = await IssueService.GetIssuesAsync(1, 100);
+            var result = await IssueService.GetIssuesAsync(1, 100);
+            allIssues = result.Data;
             
             if (allIssues?.Items != null)
             {

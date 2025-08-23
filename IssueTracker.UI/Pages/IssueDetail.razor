@@ -113,7 +113,8 @@
     private async Task LoadIssue()
     {
         isLoading = true;
-        issue = await IssueService.GetIssueByIdAsync(Id);
+        var data = await IssueService.GetIssueByIdAsync(Id);
+        issue = data.Data;
         isLoading = false;
     }
 

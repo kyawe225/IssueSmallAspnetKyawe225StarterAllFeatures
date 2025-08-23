@@ -118,7 +118,8 @@
         
         try
         {
-            issues = await IssueService.GetIssuesAsync(currentPage, pageSize);
+            var data = await IssueService.GetIssuesAsync(currentPage, pageSize);
+            issues = data.Data;
         }
         finally
         {

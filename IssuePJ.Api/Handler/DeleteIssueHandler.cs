@@ -19,6 +19,7 @@ public class DeleteIssueHandler
         {
             _context.Issues.Remove(issue);
             await _context.SaveChangesAsync();
+            return;
         }
         throw new NotFoundException("Not Found", "Issue");
     }

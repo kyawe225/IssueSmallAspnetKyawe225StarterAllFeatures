@@ -110,7 +110,7 @@
         {
             var result = await IssueService.CreateIssueAsync(issueRequest);
             
-            if (result.Contains("Successfully"))
+            if (result.Status == "200")
             {
                 isSuccess = true;
                 message = "Issue created successfully!";
@@ -120,7 +120,7 @@
             else
             {
                 isSuccess = false;
-                message = result;
+                message = result.Message ?? "Failed to create issue.";
             }
         }
         catch (Exception ex)

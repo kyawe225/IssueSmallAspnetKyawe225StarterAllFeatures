@@ -16,7 +16,7 @@ namespace IssuePJ.Api.Command
             Title = title;
             Description = description;
             Status = status;
-            DueDate = dueDate;
+            DueDate = dueDate.HasValue ? dueDate.Value.ToUniversalTime() : null;
             // AssignedTo = assignedTo;
         }
 
@@ -34,7 +34,7 @@ namespace IssuePJ.Api.Command
                 Description = Description,
                 Status = Status,
                 CreatedAt = DateTime.UtcNow,
-                DueDate = DueDate ?? DateTime.MinValue.ToUniversalTime(),
+                DueDate = DueDate?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime(),
                 // AssignedAt = DateTime.MinValue.ToUniversalTime()
             };
         }
