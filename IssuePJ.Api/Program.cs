@@ -45,7 +45,7 @@ var supportedCultures = new[]
 };
 
 var localizationOptions = new RequestLocalizationOptions()
-    .SetDefaultCulture("en")
+    .SetDefaultCulture("fr")
     .AddSupportedCultures(supportedCultures.Select(c => c.Name).ToArray())
     .AddSupportedUICultures(supportedCultures.Select(c => c.Name).ToArray());
 
@@ -55,6 +55,12 @@ app.UseHttpsRedirection();
 
 app.UseExceptionHandler(_ => { });
 
+app.UseCors(policy =>
+{
+    policy.AllowAnyHeader();
+    policy.AllowAnyMethod();
+    policy.AllowAnyOrigin();
+});
 
 
 app.MapGet("/hello", async (IStringLocalizer<SharedResource> localizer) =>
