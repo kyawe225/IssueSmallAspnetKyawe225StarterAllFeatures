@@ -2,10 +2,12 @@ using IssuePj.Api.Entities;
 using IssuePJ.Api.Command;
 using IssuePJ.Api.Context;
 using IssuePJ.Api.Exceptions;
+using IssuePJ.Api.Resources;
 using IssuePJ.Api.Response;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using System.Globalization;
 using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +23,8 @@ builder.Services.AddWolverine(x =>
 
 builder.Services.AddDbContext<ApplicationContext>(p=> p.UseNpgsql(builder?.Configuration?.GetConnectionString("ConnectionString")));
 
+builder.Services.AddLocalization(options => options.ResourcesPath ="");
+
 builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
@@ -32,9 +36,31 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+var supportedCultures = new[]
+{
+    new CultureInfo("en"),
+    new CultureInfo("fr"),
+    new CultureInfo("de"),
+    new CultureInfo("my")
+};
+
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture("en")
+    .AddSupportedCultures(supportedCultures.Select(c => c.Name).ToArray())
+    .AddSupportedUICultures(supportedCultures.Select(c => c.Name).ToArray());
+
+app.UseRequestLocalization(localizationOptions);
+
 app.UseHttpsRedirection();
 
 app.UseExceptionHandler(_ => { });
+
+
+
+app.MapGet("/hello", async (IStringLocalizer<SharedResource> localizer) =>
+{
+    return Results.Ok(localizer["Hello"].Value);
+});
 
 app.MapPost("/issues", async ([FromBody] CreateIssueCommand command, IMessageBus messageBus) =>
 {
