@@ -1,0 +1,74 @@
+﻿<div class="modern-navbar">
+    <div class="navbar-header">
+        <div class="brand-section">
+            <div class="logo-icon">
+                <i class="bi bi-bug-fill"></i>
+            </div>
+            <h4 class="brand-title">Issue Tracker</h4>
+        </div>
+        <button class="mobile-toggle" @onclick="ToggleNavMenu">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass modern-nav-scrollable">
+    <nav class="modern-nav">
+        <div class="nav-section">
+            <div class="nav-section-title">Main</div>
+            <div class="modern-nav-item">
+                <NavLink class="modern-nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="nav-icon">
+                        <i class="bi bi-speedometer2"></i>
+                    </span>
+                    <span class="nav-text">Dashboard</span>
+                </NavLink>
+            </div>
+            <div class="modern-nav-item">
+                <NavLink class="modern-nav-link" href="issues">
+                    <span class="nav-icon">
+                        <i class="bi bi-kanban"></i>
+                    </span>
+                    <span class="nav-text">Issues</span>
+                </NavLink>
+            </div>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Management</div>
+            <div class="modern-nav-item">
+                <NavLink class="modern-nav-link" href="issues/create">
+                    <span class="nav-icon">
+                        <i class="bi bi-plus-circle"></i>
+                    </span>
+                    <span class="nav-text">Create Issue</span>
+                </NavLink>
+            </div>
+        </div>
+
+        <div class="nav-section mt-auto">
+            <div class="nav-section-title">Other</div>
+            <div class="modern-nav-item">
+                <a class="modern-nav-link" href="https://learn.microsoft.com/aspnet/core/" target="_blank">
+                    <span class="nav-icon">
+                        <i class="bi bi-info-circle"></i>
+                    </span>
+                    <span class="nav-text">About</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

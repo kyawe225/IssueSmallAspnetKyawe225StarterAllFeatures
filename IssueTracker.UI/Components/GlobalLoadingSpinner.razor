@@ -1,0 +1,185 @@
+@using IssueTracker.UI.Services
+@inject ILoadingService LoadingService
+@implements IDisposable
+
+@if (isVisible)
+{
+    <div class="global-loading-overlay">
+        <div class="global-loading-container">
+            <div class="global-loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <div class="global-loading-text">
+                @loadingMessage
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .global-loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(33, 37, 41, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        backdrop-filter: blur(12px);
+    }
+
+    .global-loading-container {
+        text-align: center;
+        padding: 3rem;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        min-width: 280px;
+        backdrop-filter: blur(10px);
+    }
+
+    .global-loading-spinner {
+        display: inline-block;
+        position: relative;
+        width: 100px;
+        height: 100px;
+        margin-bottom: 1.5rem;
+    }
+
+    .spinner-ring {
+        box-sizing: border-box;
+        display: block;
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        margin: 10px;
+        border: 10px solid transparent;
+        border-radius: 50%;
+        animation: global-spinner-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    }
+
+    .spinner-ring:nth-child(1) {
+        animation-delay: -0.45s;
+        border-top-color: var(--bs-primary, #0d6efd);
+    }
+
+    .spinner-ring:nth-child(2) {
+        animation-delay: -0.3s;
+        border-top-color: var(--bs-success, #198754);
+    }
+
+    .spinner-ring:nth-child(3) {
+        animation-delay: -0.15s;
+        border-top-color: var(--bs-warning, #ffc107);
+    }
+
+    .spinner-ring:nth-child(4) {
+        animation-delay: 0;
+        border-top-color: var(--bs-danger, #dc3545);
+    }
+
+    @@keyframes global-spinner-ring {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .global-loading-text {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #495057;
+        background: linear-gradient(45deg, var(--bs-primary, #0d6efd), var(--bs-success, #198754), var(--bs-warning, #ffc107), var(--bs-danger, #dc3545));
+        background-size: 400% 400%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: global-gradient-animation 3s ease infinite;
+    }
+
+    @@keyframes global-gradient-animation {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    @@media (prefers-color-scheme: dark) {
+        .global-loading-overlay {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .global-loading-container {
+            background: rgba(33, 37, 41, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .global-loading-text {
+            color: #e9ecef;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .global-loading-container {
+            padding: 2rem;
+            margin: 1rem;
+            min-width: auto;
+            width: calc(100% - 2rem);
+            max-width: 300px;
+        }
+
+        .global-loading-spinner {
+            width: 80px;
+            height: 80px;
+        }
+
+        .spinner-ring {
+            width: 60px;
+            height: 60px;
+            margin: 10px;
+            border-width: 8px;
+        }
+
+        .global-loading-text {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+@code {
+    private bool isVisible = false;
+    private string loadingMessage = "Loading...";
+
+    protected override void OnInitialized()
+    {
+        LoadingService.LoadingStateChanged += OnLoadingStateChanged;
+        isVisible = LoadingService.IsLoading;
+        loadingMessage = LoadingService.LoadingMessage ?? "Loading...";
+    }
+
+    private void OnLoadingStateChanged(bool isLoading)
+    {
+        isVisible = isLoading;
+        loadingMessage = LoadingService.LoadingMessage ?? "Loading...";
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        LoadingService.LoadingStateChanged -= OnLoadingStateChanged;
+    }
+}

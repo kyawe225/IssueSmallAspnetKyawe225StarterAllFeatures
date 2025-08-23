@@ -1,0 +1,113 @@
+@if (IsVisible)
+{
+    <div class="card loading-card">
+        <div class="card-body text-center py-5">
+            <div class="loading-pulse-container">
+                <div class="pulse-dot pulse-dot-1"></div>
+                <div class="pulse-dot pulse-dot-2"></div>
+                <div class="pulse-dot pulse-dot-3"></div>
+                <div class="pulse-dot pulse-dot-4"></div>
+                <div class="pulse-dot pulse-dot-5"></div>
+            </div>
+            <h5 class="loading-title mt-4 mb-2">@LoadingText</h5>
+            <p class="text-muted loading-subtitle">@SubText</p>
+        </div>
+    </div>
+}
+
+<style>
+    .loading-card {
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        margin: 2rem 0;
+    }
+
+    .loading-pulse-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        height: 60px;
+    }
+
+    .pulse-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        animation: pulse-wave 1.5s ease-in-out infinite;
+    }
+
+    .pulse-dot-1 {
+        animation-delay: 0s;
+        background: linear-gradient(45deg, #007bff, #0056b3);
+    }
+
+    .pulse-dot-2 {
+        animation-delay: 0.1s;
+        background: linear-gradient(45deg, #28a745, #1e7e34);
+    }
+
+    .pulse-dot-3 {
+        animation-delay: 0.2s;
+        background: linear-gradient(45deg, #ffc107, #e0a800);
+    }
+
+    .pulse-dot-4 {
+        animation-delay: 0.3s;
+        background: linear-gradient(45deg, #fd7e14, #e55100);
+    }
+
+    .pulse-dot-5 {
+        animation-delay: 0.4s;
+        background: linear-gradient(45deg, #dc3545, #c82333);
+    }
+
+    @@keyframes pulse-wave {
+        0%, 40%, 100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        20% {
+            transform: scale(1.5);
+            opacity: 0.7;
+        }
+    }
+
+    .loading-title {
+        font-weight: 600;
+        color: #495057;
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .loading-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 0;
+        opacity: 0.8;
+    }
+
+    /* Dark theme support */
+    @@media (prefers-color-scheme: dark) {
+        .loading-card {
+            background: linear-gradient(135deg, #2c3034 0%, #1a1d20 100%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .loading-title {
+            color: #e9ecef;
+        }
+
+        .loading-subtitle {
+            color: #ced4da;
+        }
+    }
+</style>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; } = true;
+    [Parameter] public string LoadingText { get; set; } = "Loading";
+    [Parameter] public string SubText { get; set; } = "Please wait while we fetch your data";
+}

@@ -1,0 +1,104 @@
+.modern-page-layout {
+    position: relative;
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--bs-light);
+}
+
+.modern-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 17.5rem;
+    height: 100vh;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.modern-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-left: 17.5rem;
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+.modern-content {
+    flex: 1;
+    padding: 0;
+    background-color: var(--bs-light);
+    overflow-x: hidden;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 48rem) {
+    .modern-sidebar {
+        transform: translateX(-100%);
+        width: 100%;
+        z-index: 1001;
+    }
+
+    .modern-sidebar.show {
+        transform: translateX(0);
+    }
+
+    .modern-main {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .modern-content {
+        padding: 0;
+    }
+}
+
+/* Tablet styles */
+@media (min-width: 48.0625rem) and (max-width: 64rem) {
+    .modern-sidebar {
+        width: 16.25rem;
+    }
+
+    .modern-main {
+        margin-left: 16.25rem;
+    }
+}
+
+/* Large desktop styles */
+@media (min-width: 87.5rem) {
+    .modern-sidebar {
+        width: 20rem;
+    }
+
+    .modern-main {
+        margin-left: 20rem;
+    }
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Remove default margins and ensure full height */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+/* Content area styling */
+.modern-content ::deep .dashboard-container,
+.modern-content ::deep .container,
+.modern-content ::deep .container-fluid {
+    max-width: none !important;
+    padding: 1.5rem;
+}
+
+@media (max-width: 48rem) {
+    .modern-content ::deep .dashboard-container,
+    .modern-content ::deep .container,
+    .modern-content ::deep .container-fluid {
+        padding: 1rem;
+    }
+}

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(/C:\\works\\personal\\ffpjs/**)",
+      "Read(/C:\\works\\personal\\ffpjs\\IssuePJ.Api\\Entities/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

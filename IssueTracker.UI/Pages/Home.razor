@@ -1,0 +1,418 @@
+﻿@page "/"
+@using IssueTracker.UI.Models
+@using IssueTracker.UI.Services
+@inject IIssueService IssueService
+@inject NavigationManager Navigation
+
+<PageTitle>Dashboard - Issue Tracker</PageTitle>
+
+<div class="dashboard-container">
+    @if (isLoading)
+    {
+        <LoadingSpinner IsVisible="true" LoadingText="Loading Dashboard..." />
+    }
+    else
+    {
+        <div class="dashboard-header mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 mb-1">📊 Dashboard</h1>
+                    <p class="text-muted">Overview of your issue tracking system</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-primary btn-lg" @onclick="NavigateToCreateIssue">
+                        <i class="bi bi-plus-circle"></i> New Issue
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card stats-card-primary">
+                    <div class="stats-card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase fw-bold opacity-75">Total Issues</h6>
+                                <h2 class="mb-0 fw-bold">@totalIssues</h2>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="bi bi-kanban"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card stats-card-success">
+                    <div class="stats-card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase fw-bold opacity-75">Open Issues</h6>
+                                <h2 class="mb-0 fw-bold">@openIssues</h2>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card stats-card-warning">
+                    <div class="stats-card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase fw-bold opacity-75">In Progress</h6>
+                                <h2 class="mb-0 fw-bold">@inProgressIssues</h2>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="bi bi-clock"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card stats-card-info">
+                    <div class="stats-card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase fw-bold opacity-75">Closed</h6>
+                                <h2 class="mb-0 fw-bold">@closedIssues</h2>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="bi bi-check2-all"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card dashboard-card">
+                    <div class="card-header bg-transparent border-0 pb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0 fw-bold">Recent Issues</h5>
+                            <a href="/issues" class="btn btn-outline-primary btn-sm">View All</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (recentIssues?.Any() == true)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover table-borderless">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="fw-bold">Title</th>
+                                            <th class="fw-bold">Status</th>
+                                            <th class="fw-bold">Due Date</th>
+                                            <th class="fw-bold">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var issue in recentIssues.Take(5))
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div>
+                                                        <h6 class="mb-0">@issue.Title</h6>
+                                                        <small class="text-muted">@TruncateDescription(issue.Description)</small>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge rounded-pill bg-@GetStatusBadgeClass(issue.Status)">
+                                                        @issue.Status
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="@GetDueDateClass(issue.DueDate)">
+                                                        @issue.DueDate.ToString("MMM dd")
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary" @onclick="() => ViewIssue(issue.Id)">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="bi bi-inbox display-1 text-muted mb-3"></i>
+                                <h5 class="text-muted">No recent issues</h5>
+                                <p class="text-muted mb-3">Get started by creating your first issue</p>
+                                <button class="btn btn-primary" @onclick="NavigateToCreateIssue">
+                                    <i class="bi bi-plus"></i> Create Issue
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card dashboard-card mb-4">
+                    <div class="card-header bg-transparent border-0 pb-0">
+                        <h5 class="card-title mb-0 fw-bold">Status Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="status-chart">
+                            @if (totalIssues > 0)
+                            {
+                                <div class="progress-item mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="small fw-medium">Open</span>
+                                        <span class="small text-muted">@openIssues (@(Math.Round((double)openIssues / totalIssues * 100, 1))%)</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" style="width: @(Math.Round((double)openIssues / totalIssues * 100, 1))%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress-item mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="small fw-medium">In Progress</span>
+                                        <span class="small text-muted">@inProgressIssues (@(Math.Round((double)inProgressIssues / totalIssues * 100, 1))%)</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-warning" style="width: @(Math.Round((double)inProgressIssues / totalIssues * 100, 1))%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress-item">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="small fw-medium">Closed</span>
+                                        <span class="small text-muted">@closedIssues (@(Math.Round((double)closedIssues / totalIssues * 100, 1))%)</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-info" style="width: @(Math.Round((double)closedIssues / totalIssues * 100, 1))%"></div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted text-center">No data available</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card dashboard-card">
+                    <div class="card-header bg-transparent border-0 pb-0">
+                        <h5 class="card-title mb-0 fw-bold">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary" @onclick="NavigateToCreateIssue">
+                                <i class="bi bi-plus-circle me-2"></i>Create New Issue
+                            </button>
+                            <button class="btn btn-outline-secondary" @onclick="NavigateToAllIssues">
+                                <i class="bi bi-list me-2"></i>View All Issues
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .dashboard-container {
+        padding: 1.5rem;
+    }
+
+    .stats-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        overflow: hidden;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .stats-card-primary {
+        background: linear-gradient(135deg, var(--bs-primary), #4f46e5);
+        color: white;
+    }
+
+    .stats-card-success {
+        background: linear-gradient(135deg, var(--bs-success), #10b981);
+        color: white;
+    }
+
+    .stats-card-warning {
+        background: linear-gradient(135deg, var(--bs-warning), #f59e0b);
+        color: white;
+    }
+
+    .stats-card-info {
+        background: linear-gradient(135deg, var(--bs-info), #06b6d4);
+        color: white;
+    }
+
+    .stats-card-body {
+        padding: 1.5rem;
+    }
+
+    .stats-icon {
+        font-size: 2rem;
+        opacity: 0.8;
+    }
+
+    .dashboard-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: box-shadow 0.2s ease;
+    }
+
+    .dashboard-card:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .table-borderless {
+        --bs-table-border-width: 0;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(var(--bs-primary-rgb), 0.05);
+    }
+
+    .progress-item .progress {
+        border-radius: 4px;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.35em 0.65em;
+    }
+
+    .display-6 {
+        color: var(--bs-dark);
+    }
+
+    @@media (max-width: 768px) {
+        .dashboard-container {
+            padding: 1rem;
+        }
+        
+        .stats-card-body {
+            padding: 1rem;
+        }
+        
+        .dashboard-header .col-md-4 {
+            margin-top: 1rem;
+            text-align: left !important;
+        }
+    }
+</style>
+
+@code {
+    private IndexModel<Issue>? allIssues;
+    private List<Issue> recentIssues = new();
+    private bool isLoading = true;
+    
+    private int totalIssues = 0;
+    private int openIssues = 0;
+    private int inProgressIssues = 0;
+    private int closedIssues = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardData();
+    }
+
+    private async Task LoadDashboardData()
+    {
+        try
+        {
+            isLoading = true;
+            
+            allIssues = await IssueService.GetIssuesAsync(1, 100);
+            
+            if (allIssues?.Items != null)
+            {
+                recentIssues = allIssues.Items.OrderByDescending(i => i.CreatedAt).ToList();
+                totalIssues = allIssues.TotalCount;
+                
+                openIssues = allIssues.Items.Count(i => i.Status.Equals("Open", StringComparison.OrdinalIgnoreCase));
+                inProgressIssues = allIssues.Items.Count(i => i.Status.Equals("In Progress", StringComparison.OrdinalIgnoreCase));
+                closedIssues = allIssues.Items.Count(i => i.Status.Equals("Closed", StringComparison.OrdinalIgnoreCase));
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading dashboard data: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void NavigateToCreateIssue()
+    {
+        Navigation.NavigateTo("/issues/create");
+    }
+
+    private void NavigateToAllIssues()
+    {
+        Navigation.NavigateTo("/issues");
+    }
+
+    private void ViewIssue(string id)
+    {
+        Navigation.NavigateTo($"/issues/{id}");
+    }
+
+    private string GetStatusBadgeClass(string status)
+    {
+        var lowerStatus = status?.ToLower();
+        if (lowerStatus == "open")
+            return "success";
+        if (lowerStatus == "in progress")
+            return "warning";
+        if (lowerStatus == "closed")
+            return "info";
+        if (lowerStatus == "pending")
+            return "secondary";
+        return "primary";
+    }
+
+    private string GetDueDateClass(DateTime dueDate)
+    {
+        var daysUntilDue = (dueDate.Date - DateTime.Now.Date).Days;
+        
+        if (daysUntilDue < 0)
+            return "text-danger fw-bold";
+        if (daysUntilDue <= 3)
+            return "text-warning fw-medium";
+        return "text-muted";
+    }
+
+    private string TruncateDescription(string description)
+    {
+        if (string.IsNullOrEmpty(description))
+            return "";
+            
+        return description.Length > 50 
+            ? description.Substring(0, 50) + "..." 
+            : description;
+    }
+}
