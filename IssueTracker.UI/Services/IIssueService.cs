@@ -8,4 +8,5 @@ public interface IIssueService
     Task<ResponseModel<Issue?>> GetIssueByIdAsync(string id);
     Task<ResponseModel<string>> CreateIssueAsync(CreateIssueRequest request);
     Task<ResponseModel<string>> DeleteIssueAsync(string id);
+    Task<ResponseModel<string>> UpdateIssueAsync(string id, CreateIssueRequest request);
 }

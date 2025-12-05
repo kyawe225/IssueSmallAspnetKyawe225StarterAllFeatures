@@ -84,4 +84,21 @@ public class IssueService : IIssueService
             return new ResponseModel<string>();
         }
     }
+
+    public async Task<ResponseModel<string>> UpdateIssueAsync(string id, CreateIssueRequest request)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync($"/issues/{id}", request);
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadFromJsonAsync<ResponseModel<string>>(_jsonOptions);
+            return result ?? new ResponseModel<string>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating issue {id}: {ex.Message}");
+            return new ResponseModel<string>();
+        }
+    }
 }

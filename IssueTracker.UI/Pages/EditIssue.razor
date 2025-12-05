@@ -1,0 +1,166 @@
+@page "/issues/edit/{Id}"
+@using IssueTracker.UI.Models
+@using IssueTracker.UI.Services
+@inject IIssueService IssueService
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Issue</PageTitle>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0"><i class="bi bi-pencil-square"></i> Edit Issue</h3>
+                </div>
+                <div class="card-body">
+                    @if (issueRequest != null)
+                    {
+                        <EditForm Model="@issueRequest" OnValidSubmit="@HandleValidSubmit">
+                            <DataAnnotationsValidator />
+
+                            <div class="mb-3">
+                                <label for="title" class="form-label"><i class="bi bi-card-heading"></i> Title</label>
+                                <InputText @bind-Value="issueRequest.Title"
+                                           class="form-control"
+                                           id="title"
+                                           placeholder="Enter issue title" />
+                                <ValidationMessage For="@(() => issueRequest.Title)" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label"><i class="bi bi-file-text"></i> Description</label>
+                                <InputTextArea @bind-Value="issueRequest.Description"
+                                             class="form-control"
+                                             id="description"
+                                             rows="4"
+                                             placeholder="Enter issue description" />
+                                <ValidationMessage For="@(() => issueRequest.Description)" />
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label"><i class="bi bi-flag"></i> Status</label>
+                                        <InputSelect @bind-Value="issueRequest.Status" class="form-select" id="status">
+                                            <option value="">Select Status</option>
+                                            <option value="Open">Open</option>
+                                            <option value="In Progress">In Progress</option>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Closed">Closed</option>
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => issueRequest.Status)" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="dueDate" class="form-label"><i class="bi bi-calendar-date"></i> Due Date</label>
+                                        <InputDate @bind-Value="issueRequest.DueDate" class="form-control" id="dueDate" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(message))
+                            {
+                                <div class="alert @(isSuccess ? "alert-success" : "alert-danger")">
+                                    @message
+                                </div>
+                            }
+
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-secondary me-2" @onclick="Cancel">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                                    @if (isSubmitting)
+                                    {
+                                        <div class="spinner-border spinner-border-sm me-2" role="status">
+                                            <span class="visually-hidden">Updating...</span>
+                                        </div>
+                                    }
+                                    @(isSubmitting ? "Updating Issue..." : "Update Issue")
+                                    @if (!isSubmitting)
+                                    {
+                                        <i class="bi bi-check-circle ms-2"></i>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
+                    else
+                    {
+                        <p><em>Loading...</em></p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private CreateIssueRequest issueRequest = new();
+    private bool isSubmitting = false;
+    private string message = string.Empty;
+    private bool isSuccess = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await IssueService.GetIssueByIdAsync(Id);
+        if (result.Status == "200" && result.Data != null)
+        {
+            var issue = result.Data;
+            issueRequest = new CreateIssueRequest
+            {
+                Title = issue.Title,
+                Description = issue.Description,
+                Status = issue.Status,
+                DueDate = issue.DueDate
+            };
+        }
+        else
+        {
+            message = result.Message ?? "Failed to load issue.";
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        message = string.Empty;
+
+        try
+        {
+            var result = await IssueService.UpdateIssueAsync(Id, issueRequest);
+
+            if (result.Status == "200")
+            {
+                isSuccess = true;
+                message = "Issue updated successfully!";
+                await Task.Delay(1500);
+                Navigation.NavigateTo($"/issues");
+            }
+            else
+            {
+                isSuccess = false;
+                message = result.Message ?? "Failed to update issue.";
+            }
+        }
+        catch (Exception ex)
+        {
+            isSuccess = false;
+            message = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo($"/issues");
+    }
+}
