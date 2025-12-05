@@ -103,6 +103,17 @@ app.MapDelete("/issues/{Id}", async (string Id, IMessageBus messageBus) =>
     });
 });
 
+app.MapPut("/issues/changeStatus", async ([FromBody] ChangeStatusIssueCommand command, IMessageBus messageBus) =>
+{
+    await messageBus.InvokeAsync(command);
+    return Results.Ok(new ResponseModel<Issue>
+    {
+        Status = "200",
+        Message = "Issue status updated successfully",
+        Data = null
+    });
+});
+
 app.MapPut("/issues/{Id}", async (string Id, [FromBody] UpdateIssueCommand command, IMessageBus messageBus) =>
 {
     command.IssueId = Id;
@@ -114,5 +125,7 @@ app.MapPut("/issues/{Id}", async (string Id, [FromBody] UpdateIssueCommand comma
         Data = null
     });
 });
+
+
 
 await app.RunAsync();

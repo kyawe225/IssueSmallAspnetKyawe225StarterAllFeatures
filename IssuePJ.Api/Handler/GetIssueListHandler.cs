@@ -20,7 +20,7 @@ public class GetIssueListHandler
     public async Task<ResponseModel<IndexModel<Issue>>> Handle(GetIssueListCommand command)
     {
         var start = (command.Page - 1) * command.PageSize;
-        var issues = await _context.Issues.AsNoTracking().Skip(start).Take(command.PageSize).ToListAsync();
+        var issues = await _context.Issues.AsNoTracking().OrderByDescending(i=> i.CreatedAt).Skip(start).Take(command.PageSize).ToListAsync();
         return new ResponseModel<IndexModel<Issue>>
         {
             Status = "200",
